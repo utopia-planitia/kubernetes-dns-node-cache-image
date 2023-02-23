@@ -1,4 +1,5 @@
-name: CI/CD
+name: lint, build, and push container(s)
+
 on:
   workflow_dispatch:
   push:
@@ -7,33 +8,49 @@ on:
   pull_request:
     branches:
       - main
+
 jobs:
-  Hadolint:
+  hadolint:
+    name: lint Dockerfile(s)
+
     runs-on: ubuntu-22.04
+
+    timeout-minutes: 2
+
     permissions:
       contents: read
+
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      - name: lint
+
+      - name: lint Dockerfile(s)
         uses: hadolint/hadolint-action@v3.1.0
         with:
           failure-threshold: style
           ignore: DL3018,DL4006
-  Docker:
+
+  docker-buildx:
+    name: build (and push) container images
+
     needs: hadolint
+
     runs-on: ubuntu-22.04
+
+    timeout-minutes: 5
+
     permissions:
       contents: read
       packages: write
+
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Setup Docker
+
+      - name: setup docker buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build
+
+      - name: build the container image(s)
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -41,7 +58,8 @@ jobs:
           push: false
           cache-to: type=local,dest=/tmp/.buildx-cache
           cache-from: type=registry,ref=ghcr.io/utopia-planitia/kubernetes-dns-node-cache-image:cache,ignore-error=true
-      - name: Extract versions
+
+      - name: extract iptables and kubernetes/dns versions from Dockerfile
         if: github.event_name != 'pull_request'
         run: |
           set -eux
@@ -49,7 +67,8 @@ jobs:
           echo "IPTABLES_VERSION=${IPTABLES_VERSION:?}" | tee -a "${GITHUB_ENV:?}"
           KUBERNETES_DNS_VERSION="$(grep -Eom1 'KUBERNETES_DNS_VERSION=[0-9]+\.[0-9]+\.[0-9]+\S*' Dockerfile | cut -d= -f2)"
           echo "KUBERNETES_DNS_VERSION=${KUBERNETES_DNS_VERSION:?}" | tee -a "${GITHUB_ENV:?}"
-      - name: Prepare metadata
+
+      - name: prepare repository metadata and tool versions to be used in container labels and tags
         if: github.event_name != 'pull_request'
         id: meta
         uses: docker/metadata-action@v4
@@ -61,14 +80,16 @@ jobs:
             type=match,pattern=^(\d+\.\d+\.\d+)-iptables\d+\.\d+\.\d+\S*$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
           flavor: |
             latest=true
-      - name: Login
+
+      - name: login to the container registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push
+
+      - name: build and push the container image(s)
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v4
         with:
