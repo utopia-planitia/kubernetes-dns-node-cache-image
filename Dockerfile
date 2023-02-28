@@ -7,6 +7,8 @@ ARG KUBERNETES_DNS_VERSION=1.21.1
 FROM docker.io/library/alpine:3.16 as iptables-installer
 
 ARG IPTABLES_VERSION
+# ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
+ENV IPTABLES_VERSION="${IPTABLES_VERSION:?}"
 
 # install iptables into a separate root directory so it can be copied into a scratch/distroless image easily with all dependencies
 RUN set -eux; \
@@ -56,6 +58,8 @@ FROM docker.io/library/golang:1.20.0-alpine3.16 AS node-cache-builder
 WORKDIR /src
 
 ARG KUBERNETES_DNS_VERSION
+# ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
+ENV KUBERNETES_DNS_VERSION="${KUBERNETES_DNS_VERSION:?}"
 
 # download the kubernetes/dns source code
 RUN set -eux; \
@@ -80,6 +84,7 @@ FROM scratch
 
 # the environment variables are not necessary but they give insight into what is installed in the image (eg. with `docker inspect`)
 ARG IPTABLES_VERSION KUBERNETES_DNS_VERSION
+# ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
 ENV IPTABLES_VERSION="${IPTABLES_VERSION:?}" KUBERNETES_DNS_VERSION="${KUBERNETES_DNS_VERSION:?}"
 
 # copy the artifacts from the previous stages into this final distroless / scratch image
