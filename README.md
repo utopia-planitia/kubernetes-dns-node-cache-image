@@ -4,7 +4,7 @@ A distroless container image with node-cache ([kubernetes/dns](https://github.co
 
 We use the “NodeLocal DNSCache” (see <https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/>) in our Kubernetes clusters.
 
-We install it using this manifest: <https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml>
+We install it using this manifest: <https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml> ([permalink](https://github.com/kubernetes/kubernetes/blob/3b17aece1fa492e98aa82b948597b3641961195f/cluster/addons/dns/nodelocaldns/nodelocaldns.yaml))
 
 The image used in this manifest is a distroless image comes bundled with iptables 1.8.7. This was fine while our cluster nodes and kube-router used the same iptables version, too. But recently kube-router updated to iptables 1.8.8.
 
