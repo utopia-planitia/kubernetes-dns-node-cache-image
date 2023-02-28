@@ -35,7 +35,7 @@ jobs:
           ignore: DL3018,DL4006
 
   docker-buildx:
-    name: build (and push) container images
+    name: build (and push) container image
 
     needs: hadolint
 
@@ -54,7 +54,7 @@ jobs:
       - name: setup docker buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: build the container image(s)
+      - name: build the container image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -63,14 +63,62 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           cache-from: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:cache,ignore-error=true
 
-      - name: extract iptables and kubernetes/dns versions from Dockerfile
+      - name: extract kubernetes/dns versions from Dockerfile
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         run: |
           set -eux
-          IPTABLES_VERSION="$(grep -Eom1 'IPTABLES_VERSION=[0-9]+\.[0-9]+\.[0-9]+\S*' Dockerfile | cut -d= -f2)"
-          echo "IPTABLES_VERSION=${IPTABLES_VERSION:?}" | tee -a "${GITHUB_ENV:?}"
+
           KUBERNETES_DNS_VERSION="$(grep -Eom1 'KUBERNETES_DNS_VERSION=[0-9]+\.[0-9]+\.[0-9]+\S*' Dockerfile | cut -d= -f2)"
           echo "KUBERNETES_DNS_VERSION=${KUBERNETES_DNS_VERSION:?}" | tee -a "${GITHUB_ENV:?}"
+
+      - name: create a new git tag
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          set -eux
+
+          MAYBE_LATEST_TAG="$(git tag --list "${KUBERNETES_DNS_VERSION:?}+build.[0-9]*" --sort=version:refname | tail -n1)"
+
+          # no latest tag existing (`-z` for String length is zero)
+          if test -z "${MAYBE_LATEST_TAG:-}"; then
+            NEW_BUILD=0
+            NEXT_TAG="${KUBERNETES_DNS_VERSION:?}+build.${NEW_BUILD:?}"
+
+            CURRENT_HASH="$(git rev-parse --verify HEAD)"
+            git tag "${NEXT_TAG:?}" "${CURRENT_HASH:?}"
+            git push origin "${NEXT_TAG:?}"
+
+            # make the build number available as environment variable in the following workflow steps
+            echo "BUILD_NUMBER=${NEW_BUILD:?}" | tee -a "${GITHUB_ENV:?}"
+
+            exit 0
+          fi
+
+          LATEST_TAG=${MAYBE_LATEST_TAG:?}
+
+          LATEST_BUILD=$(echo "${LATEST_TAG:?}" | rev | cut --delimiter="." --fields=1 | rev)
+
+          CURRENT_HASH="$(git rev-parse --verify HEAD)"
+
+          # no new tag is needed (current commit == commit of latest tag)
+          LATEST_TAG_GIT_HASH="$(git rev-list -n 1 ${LATEST_TAG})"
+          if test "${LATEST_TAG_GIT_HASH:?}" = "${CURRENT_HASH:?}"; then
+            # make the build number available as environment variable in the following workflow steps
+            echo "BUILD_NUMBER=${LATEST_BUILD:?}" | tee -a "${GITHUB_ENV:?}"
+
+            exit 0
+          fi
+
+          # new tag is needed
+
+          NEW_BUILD=$((LATEST_BUILD + 1))
+          NEXT_TAG="${KUBERNETES_DNS_VERSION:?}+build.${NEW_BUILD:?}"
+
+          # create and push the new tag
+          git tag "${NEXT_TAG:?}" "${CURRENT_HASH:?}"
+          git push origin "${NEXT_TAG:?}"
+
+          # make the build number available as environment variable in the following workflow steps
+          echo "BUILD_NUMBER=${NEW_BUILD:?}" | tee -a "${GITHUB_ENV:?}"
 
       # prepare container image tags from iptables and kubernetes/dns versions and container image labels from git metadata (repository url, commit hash, ...)
       - name: prepare container image labels and container image tags
@@ -79,10 +127,9 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}
-          tags: |
-            type=match,pattern=^(\d+\.\d+\.\d+-iptables\d+\.\d+\.\d+\S*)$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
-            type=match,pattern=^(\d+\.\d+\.\d+-iptables\d+\.\d+\.\d+)\S*$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
-            type=match,pattern=^(\d+\.\d+\.\d+)-iptables\d+\.\d+\.\d+\S*$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
+          tags: | # https://github.com/docker/metadata-action#typeraw
+            type=raw,value=${{ env.KUBERNETES_DNS_VERSION }}-build.${{ env.BUILD_NUMBER }}
+            type=raw,value=${{ env.KUBERNETES_DNS_VERSION }}
           flavor: |
             latest=true
 
@@ -94,7 +141,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build and push the container image(s)
+      - name: build and push the container image
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         uses: docker/build-push-action@v4
         with:
