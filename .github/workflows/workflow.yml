@@ -1,4 +1,4 @@
-name: lint, build, and push container(s)
+name: build and push container image
 
 on:
   workflow_dispatch:
@@ -68,7 +68,8 @@ jobs:
           KUBERNETES_DNS_VERSION="$(grep -Eom1 'KUBERNETES_DNS_VERSION=[0-9]+\.[0-9]+\.[0-9]+\S*' Dockerfile | cut -d= -f2)"
           echo "KUBERNETES_DNS_VERSION=${KUBERNETES_DNS_VERSION:?}" | tee -a "${GITHUB_ENV:?}"
 
-      - name: prepare repository metadata and tool versions to be used in container labels and tags
+      # prepare container image tags from iptables and kubernetes/dns versions and container image labels from git metadata (repository url, commit hash, ...)
+      - name: prepare container image labels and container image tags
         if: github.event_name != 'pull_request'
         id: meta
         uses: docker/metadata-action@v4
