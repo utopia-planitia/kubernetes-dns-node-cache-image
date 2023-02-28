@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   hadolint:
     name: lint Dockerfile(s)
@@ -57,7 +61,7 @@ jobs:
           platforms: amd64
           push: false
           cache-to: type=local,dest=/tmp/.buildx-cache
-          cache-from: type=registry,ref=ghcr.io/utopia-planitia/kubernetes-dns-node-cache-image:cache,ignore-error=true
+          cache-from: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:cache,ignore-error=true
 
       - name: extract iptables and kubernetes/dns versions from Dockerfile
         if: github.event_name != 'pull_request'
@@ -74,7 +78,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/utopia-planitia/kubernetes-dns-node-cache-image
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}
           tags: |
             type=match,pattern=^(\d+\.\d+\.\d+-iptables\d+\.\d+\.\d+\S*)$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
             type=match,pattern=^(\d+\.\d+\.\d+-iptables\d+\.\d+\.\d+)\S*$,group=1,value=${{ env.KUBERNETES_DNS_VERSION }}-iptables${{ env.IPTABLES_VERSION }}
@@ -86,7 +90,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
+          registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,4 +104,4 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=registry,ref=ghcr.io/utopia-planitia/kubernetes-dns-node-cache-image:cache,mode=max
+          cache-to: type=registry,ref=${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:cache,mode=max
