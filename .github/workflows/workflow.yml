@@ -149,7 +149,14 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: |
+            org.opencontainers.image.title=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.title'] }}
+            org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+            org.opencontainers.image.url=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}
+            org.opencontainers.image.source=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}
+            org.opencontainers.image.version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            org.opencontainers.image.revision=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            org.opencontainers.image.licenses=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.licenses'] }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
