@@ -44,7 +44,7 @@ jobs:
     timeout-minutes: 5
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
