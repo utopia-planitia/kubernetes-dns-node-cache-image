@@ -51,6 +51,9 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
+      - name: fetch tags
+        run: git fetch --tags
+
       - name: setup docker buildx
         uses: docker/setup-buildx-action@v2
 
