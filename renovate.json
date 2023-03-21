@@ -21,9 +21,9 @@
         "^Dockerfile$"
       ],
       "datasourceTemplate": "docker",
-      "depNameTemplate": "alpine",
-      "versioningTemplate": "regex:^(?<major>\\d+)[.](?<minor>\\d+)$",
-      "extractVersionTemplate": "^(?<major>\\d+)_(?<minor>\\d+)$"
+      "depNameTemplate": "docker.io/library/alpine",
+      "versioningTemplate": "regex:^(?<major>\\d+)_(?<minor>\\d+)$",
+      "extractVersionTemplate": "^(?<major>\\d+)[.](?<minor>\\d+)(?:[.](?<patch>\\d+))?$"
     }
   ]
 }
