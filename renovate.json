@@ -10,5 +10,13 @@
   ],
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
-  "separateMinorPatch": true
+  "separateMinorPatch": true,
+  "regexManagers": [
+    {
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "docker.io/library/alpine",
+      "matchStrings": ["# renovate: datasource=repology depName=alpine_(?<currentValue>\\d+_\\d+)\\/"],
+      "versioningTemplate": "regex:^(?<major>\\d+)_(?<minor>\\d+)$"
+    }
+  ]
 }
