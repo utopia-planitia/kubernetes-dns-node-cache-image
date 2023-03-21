@@ -4,7 +4,7 @@ ARG IPTABLES_VERSION=1.8.8-r1
 ARG KUBERNETES_DNS_VERSION=1.21.1
 
 
-FROM docker.io/library/alpine:3.16 as iptables-installer
+FROM docker.io/library/alpine:3.16@sha256:2cf17aa35fbcb6ece81692a64bfbadaf096590241ed9f95dd5f94f0e9f674784 as iptables-installer
 
 ARG IPTABLES_VERSION
 # ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
@@ -53,7 +53,7 @@ RUN set -eux; \
         grep -Fq nf_tables
 
 
-FROM docker.io/library/golang:1.20.0-alpine3.16 AS node-cache-builder
+FROM docker.io/library/golang:1.20.0-alpine3.16@sha256:846aec1428bbc484681625bc066c057f2fc5805eb9ea67bd47e4f86e4ca35d83 AS node-cache-builder
 
 WORKDIR /src
 
