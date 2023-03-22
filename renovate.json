@@ -22,7 +22,8 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "docker.io/library/alpine",
-      "versioningTemplate": "regex:^(?<major>\\d+)_(?<minor>\\d+)$"
+      "versioningTemplate": "regex:^(?<major>\\d+)_(?<minor>\\d+)$",
+      "autoReplaceStringTemplate": "# renovate: datasource=repology depName=alpine_{{{newMajor}}}_{{{newMinor}}}/"
     }
   ]
 }
