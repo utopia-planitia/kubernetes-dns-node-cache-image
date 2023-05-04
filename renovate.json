@@ -12,6 +12,17 @@
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "separateMinorPatch": true,
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "kubernetes/dns"
+      ],
+      "automerge": false
+    }
+  ],
   "regexManagers": [
     {
       "description": "update Alpine versions in repology repositories annotations like \"# renovate: datasource=repology depName=alpine_3_17/iptables\"",
