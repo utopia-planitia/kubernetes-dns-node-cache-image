@@ -15,6 +15,10 @@
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": true,
+  "labels": [
+    "bot",
+    "renovate-bot"
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
