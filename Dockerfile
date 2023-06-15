@@ -4,7 +4,7 @@ ARG IPTABLES_VERSION=1.8.9-r2
 ARG KUBERNETES_DNS_VERSION=1.22.22
 
 
-FROM docker.io/library/alpine:3.18.2@sha256:5246eec74dffc9a5f6608c4e7c81bd33455ecc64f558bf49eb334c4f05e47eee as iptables-installer
+FROM docker.io/library/alpine:3.18.2@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1 as iptables-installer
 
 ARG IPTABLES_VERSION
 # ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
