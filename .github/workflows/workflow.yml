@@ -127,7 +127,7 @@ jobs:
       - name: prepare container image labels and container image tags
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         id: meta
-        uses: docker/metadata-action@e6428a5c4e294a61438ed7f43155db912025b6b3 # v5
+        uses: docker/metadata-action@31cebacef4805868f9ce9a0cb03ee36c32df2ac4 # v5
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}
           tags: | # https://github.com/docker/metadata-action#typeraw
