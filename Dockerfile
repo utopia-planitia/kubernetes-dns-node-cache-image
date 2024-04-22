@@ -1,5 +1,5 @@
 # renovate: datasource=repology depName=alpine_3_19/iptables versioning=loose
-ARG IPTABLES_VERSION=1.8.9-r2
+ARG IPTABLES_VERSION=1.8.10-r3
 # renovate: datasource=github-releases depName=kubernetes/dns
 ARG KUBERNETES_DNS_VERSION=1.23.0
 
