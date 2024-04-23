@@ -25,6 +25,18 @@
         "kubernetes/dns"
       ],
       "automerge": false
+    },
+    {
+      "description": "Disable major, minor and patch updates of iptables because it needs to be updated (manually, for now) in sync with the other components in our clusters.",
+      "matchPackagePatterns": [
+        "^alpine_\\d+_\\d+\/iptables$"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "enabled": false
     }
   ],
   "regexManagers": [
