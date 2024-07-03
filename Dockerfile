@@ -53,7 +53,7 @@ RUN set -eux; \
         grep -Fq nf_tables
 
 
-FROM docker.io/library/golang:1.22.5-alpine3.20@sha256:523be8675c81c86325fadcf2ff9be68802a716fa94b1e42679c4782e75b076bf AS node-cache-builder
+FROM docker.io/library/golang:1.22.5-alpine3.20@sha256:8c9183f715b0b4eca05b8b3dbf59766aaedb41ec07477b132ee2891ac0110a07 AS node-cache-builder
 
 WORKDIR /src
 
