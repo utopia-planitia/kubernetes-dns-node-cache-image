@@ -58,7 +58,7 @@ jobs:
         uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3
 
       - name: build the container image
-        uses: docker/build-push-action@15560696de535e4014efeff63c48f16952e52dd1 # v6
+        uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # v6
         with:
           context: .
           platforms: amd64
@@ -146,7 +146,7 @@ jobs:
 
       - name: build and push the container image
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        uses: docker/build-push-action@15560696de535e4014efeff63c48f16952e52dd1 # v6
+        uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # v6
         with:
           context: .
           labels: |
