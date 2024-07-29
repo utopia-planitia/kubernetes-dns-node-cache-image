@@ -1,10 +1,10 @@
-# renovate: datasource=repology depName=alpine_3_18/iptables versioning=loose
+# renovate: datasource=repology depName=alpine_3_20/iptables versioning=loose
 ARG IPTABLES_VERSION=1.8.9-r2
 # renovate: datasource=github-releases depName=kubernetes/dns
 ARG KUBERNETES_DNS_VERSION=1.23.1
 
 
-FROM docker.io/library/alpine:3.18.8@sha256:5292533eb4efd4b5cf35e93b5a2b7d0e07ea193224c49446c7802c19ee4f2da5 AS iptables-installer
+FROM docker.io/library/alpine:3.20.2@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5 AS iptables-installer
 
 ARG IPTABLES_VERSION
 # ARGs are only available during build-time. we include them as ENVs, too, so they are available in image metadata and at run-time.
