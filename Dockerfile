@@ -1,7 +1,7 @@
 # renovate: datasource=repology depName=alpine_3_18/iptables versioning=loose
 ARG IPTABLES_VERSION=1.8.9-r2
 # renovate: datasource=github-releases depName=kubernetes/dns
-ARG KUBERNETES_DNS_VERSION=1.23.1
+ARG KUBERNETES_DNS_VERSION=1.24.0
 
 
 FROM docker.io/library/alpine:3.18.9@sha256:2995c82e8e723d9a5c8585cb8e901d1c50e3c2759031027d3bff577449435157 AS iptables-installer
